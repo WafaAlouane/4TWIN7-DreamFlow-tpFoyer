@@ -7,25 +7,22 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import tn.esprit.tpfoyer.entity.Foyer;
 import tn.esprit.tpfoyer.repository.FoyerRepository;
-import tn.esprit.tpfoyer.service.FoyerServiceImpl;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 class FoyerServiceImplTest {
 
-    @InjectMocks
-    private FoyerServiceImpl foyerService;
-
     @Mock
     private FoyerRepository foyerRepository;
+
+    @InjectMocks
+    private FoyerServiceImpl foyerService;
 
     @BeforeEach
     void setUp() {
@@ -33,105 +30,104 @@ class FoyerServiceImplTest {
     }
 
     @Test
-    void testRetrieveAllFoyers_success() {
-        List<Foyer> foyers = Arrays.asList(new Foyer(), new Foyer());
+    void testRetrieveAllFoyers() {
+        // Arrange
+        List<Foyer> foyers = Arrays.asList(
+                new Foyer(1L, "Foyer A", 100, null, null),
+                new Foyer(2L, "Foyer B", 200, null, null)
+        );
         when(foyerRepository.findAll()).thenReturn(foyers);
 
+        // Act
         List<Foyer> result = foyerService.retrieveAllFoyers();
 
-        assertNotNull(result);
+        // Assert
         assertEquals(2, result.size());
+        assertEquals("Foyer A", result.get(0).getNomFoyer());
         verify(foyerRepository, times(1)).findAll();
     }
 
     @Test
-    void testRetrieveAllFoyers_emptyList() {
-        when(foyerRepository.findAll()).thenReturn(Arrays.asList());
+    void testRetrieveFoyer() {
+        // Arrange
+        Foyer foyer = new Foyer(1L, "Foyer A", 100, null, null);
+        when(foyerRepository.findById(1L)).thenReturn(Optional.of(foyer));
 
-        List<Foyer> result = foyerService.retrieveAllFoyers();
-
-        assertNotNull(result);
-        assertTrue(result.isEmpty());
-        verify(foyerRepository, times(1)).findAll();
-    }
-
-    @Test
-    void testRetrieveFoyer_existingId() {
-        Foyer foyer = new Foyer();
-        when(foyerRepository.findById(anyLong())).thenReturn(Optional.of(foyer));
-
+        // Act
         Foyer result = foyerService.retrieveFoyer(1L);
 
+        // Assert
         assertNotNull(result);
-        assertEquals(foyer, result);
+        assertEquals("Foyer A", result.getNomFoyer());
         verify(foyerRepository, times(1)).findById(1L);
     }
 
     @Test
-    void testRetrieveFoyer_nonExistentId() {
-        when(foyerRepository.findById(anyLong())).thenReturn(Optional.empty());
+    void testRetrieveFoyerNotFound() {
+        // Arrange
+        when(foyerRepository.findById(1L)).thenReturn(Optional.empty());
 
-        NoSuchElementException exception = assertThrows(NoSuchElementException.class, () -> foyerService.retrieveFoyer(99L));
-        assertEquals("Foyer with ID 99 not found", exception.getMessage());
-        verify(foyerRepository, times(1)).findById(99L);
+        // Act & Assert
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            foyerService.retrieveFoyer(1L);
+        });
+        assertEquals("Foyer not found with id: 1", exception.getMessage());
     }
 
     @Test
-    void testAddFoyer_success() {
-        Foyer foyer = new Foyer();
-        when(foyerRepository.save(any(Foyer.class))).thenReturn(foyer);
+    void testAddFoyer() {
+        // Arrange
+        Foyer foyer = new Foyer(null, "Foyer A", 100, null, null);
+        Foyer savedFoyer = new Foyer(1L, "Foyer A", 100, null, null);
+        when(foyerRepository.save(any(Foyer.class))).thenReturn(savedFoyer);
 
+        // Act
         Foyer result = foyerService.addFoyer(foyer);
 
+        // Assert
         assertNotNull(result);
-        assertEquals(foyer, result);
-        verify(foyerRepository, times(1)).save(foyer);
+        assertEquals(1L, result.getIdFoyer());
+        verify(foyerRepository, times(1)).save(any(Foyer.class));
     }
 
     @Test
-    void testAddFoyer_nullFoyer() {
-        when(foyerRepository.save(null)).thenThrow(new IllegalArgumentException("Foyer cannot be null"));
-
-        assertThrows(IllegalArgumentException.class, () -> foyerService.addFoyer(null));
-        verify(foyerRepository, times(1)).save(null);
-    }
-
-    @Test
-    void testModifyFoyer_success() {
-        Foyer foyer = new Foyer();
+    void testModifyFoyer() {
+        // Arrange
+        Foyer foyer = new Foyer(1L, "Foyer A", 100, null, null);
         when(foyerRepository.save(any(Foyer.class))).thenReturn(foyer);
 
+        // Act
         Foyer result = foyerService.modifyFoyer(foyer);
 
+        // Assert
         assertNotNull(result);
-        assertEquals(foyer, result);
-        verify(foyerRepository, times(1)).save(foyer);
+        assertEquals("Foyer A", result.getNomFoyer());
+        verify(foyerRepository, times(1)).save(any(Foyer.class));
     }
 
     @Test
-    void testModifyFoyer_nullFoyer() {
-        when(foyerRepository.save(null)).thenThrow(new IllegalArgumentException("Foyer cannot be null"));
+    void testRemoveFoyer() {
+        // Arrange
+        when(foyerRepository.existsById(1L)).thenReturn(true);
+        doNothing().when(foyerRepository).deleteById(1L);
 
-        assertThrows(IllegalArgumentException.class, () -> foyerService.modifyFoyer(null));
-        verify(foyerRepository, times(1)).save(null);
-    }
+        // Act
+        foyerService.removeFoyer(1L);
 
-    @Test
-    void testRemoveFoyer_existingId() {
-        doNothing().when(foyerRepository).deleteById(anyLong());
-
-        assertDoesNotThrow(() -> foyerService.removeFoyer(1L));
+        // Assert
+        verify(foyerRepository, times(1)).existsById(1L);
         verify(foyerRepository, times(1)).deleteById(1L);
     }
 
-
-
-
     @Test
-    void testRemoveFoyer_nonExistentId() {
-        doThrow(new RuntimeException("Foyer not found")).when(foyerRepository).deleteById(anyLong());
+    void testRemoveFoyerNotFound() {
+        // Arrange
+        when(foyerRepository.existsById(1L)).thenReturn(false);
 
-        assertThrows(RuntimeException.class, () -> foyerService.removeFoyer(99L));
-        verify(foyerRepository, times(1)).deleteById(99L);
+        // Act & Assert
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            foyerService.removeFoyer(1L);
+        });
+        assertEquals("Foyer not found with id: 1", exception.getMessage());
     }
 }

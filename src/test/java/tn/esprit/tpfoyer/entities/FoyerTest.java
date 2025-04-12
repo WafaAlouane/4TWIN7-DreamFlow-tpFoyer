@@ -1,4 +1,4 @@
-package tn.esprit.tpfoyer.entities;
+package tn.esprit.tpfoyer.entity; // Correct package
 
 import org.junit.jupiter.api.Test;
 import tn.esprit.tpfoyer.entity.Bloc;
@@ -25,12 +25,9 @@ class FoyerTest {
         Foyer foyer2 = new Foyer(4L, "Foyer D", 250, null, null);
         Foyer foyer3 = new Foyer(5L, "Foyer E", 300, null, null);
 
-        // Check equality
-        assertEquals(foyer1, foyer2);  // Should pass
-        assertNotEquals(foyer1, foyer3); // Should pass
+        assertEquals(foyer1, foyer2); // Requires @EqualsAndHashCode
+        assertNotEquals(foyer1, foyer3);
     }
-
-
 
     @Test
     void testFoyerId() {
