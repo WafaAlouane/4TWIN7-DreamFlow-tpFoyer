@@ -1,6 +1,8 @@
 package tn.esprit.tpfoyer.control;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.tpfoyer.entity.Foyer;
 import tn.esprit.tpfoyer.service.IFoyerService;
@@ -14,37 +16,33 @@ public class FoyerRestController {
 
     IFoyerService foyerService;
 
-    // http://localhost:8089/tpfoyer/foyer/retrieve-all-foyers
     @GetMapping("/retrieve-all-foyers")
+    @ResponseStatus(HttpStatus.OK)
     public List<Foyer> getFoyers() {
-        List<Foyer> listFoyers = foyerService.retrieveAllFoyers();
-        return listFoyers;
+        return foyerService.retrieveAllFoyers();
     }
-    // http://localhost:8089/tpfoyer/foyer/retrieve-foyer/8
+
     @GetMapping("/retrieve-foyer/{foyer-id}")
+    @ResponseStatus(HttpStatus.OK)
     public Foyer retrieveFoyer(@PathVariable("foyer-id") Long fId) {
-        Foyer foyer = foyerService.retrieveFoyer(fId);
-        return foyer;
+        return foyerService.retrieveFoyer(fId);
     }
 
-    // http://localhost:8089/tpfoyer/foyer/add-foyer
     @PostMapping("/add-foyer")
-    public Foyer addFoyer(@RequestBody Foyer f) {
-        Foyer foyer = foyerService.addFoyer(f);
-        return foyer;
+    @ResponseStatus(HttpStatus.CREATED)
+    public Foyer addFoyer(@Valid @RequestBody Foyer f) {
+        return foyerService.addFoyer(f);
     }
 
-    // http://localhost:8089/tpfoyer/foyer/remove-foyer/{foyer-id}
     @DeleteMapping("/remove-foyer/{foyer-id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeFoyer(@PathVariable("foyer-id") Long fId) {
         foyerService.removeFoyer(fId);
     }
 
-    // http://localhost:8089/tpfoyer/foyer/modify-foyer
     @PutMapping("/modify-foyer")
-    public Foyer modifyFoyer(@RequestBody Foyer f) {
-        Foyer foyer = foyerService.modifyFoyer(f);
-        return foyer;
+    @ResponseStatus(HttpStatus.OK)
+    public Foyer modifyFoyer(@Valid @RequestBody Foyer f) {
+        return foyerService.modifyFoyer(f);
     }
-
 }

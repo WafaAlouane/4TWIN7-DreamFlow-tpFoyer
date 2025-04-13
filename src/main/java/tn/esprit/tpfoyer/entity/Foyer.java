@@ -12,6 +12,7 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 @ToString
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Foyer {
@@ -29,10 +30,8 @@ public class Foyer {
     Universite universite;
 
     @OneToMany(mappedBy = "foyer")
-            @JsonIgnore
-            @ToString.Exclude
+    @JsonIgnore
+    @ToString.Exclude
     Set<Bloc> blocs;
 
 }
-
-
