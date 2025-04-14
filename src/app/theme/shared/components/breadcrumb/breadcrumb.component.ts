@@ -61,7 +61,7 @@ export class BreadcrumbComponent {
         const breadcrumbList = this.filterNavigation(this.navigations, activeLink);
         this.navigationList = breadcrumbList;
  
-        this.titleService.setTitle(' dreamflow Hmid Front end Testing');
+        this.titleService.setTitle(' dreamflow Front end Testing');
       }
     });
   }
