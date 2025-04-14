@@ -1,12 +1,14 @@
-{
-  "dashboard": {
-    "id": null,
-    "uid": null,
-    "title": "Demo Dashboard",
-    "timezone": "browser",
-    "panels": [],
-    "schemaVersion": 16,
-    "version": 0
-  },
-  "overwrite": true
-}
+curl -X POST http://admin:grafana@192.168.50.4:3000/api/dashboards/db \
+  -H "Content-Type: application/json" \
+  -d '{
+    "dashboard": {
+      "id": null,
+      "uid": "haryan-jenkins",
+      "title": "Jenkins3A Performance and Health Overview",
+      "timezone": "browser",
+      "panels": [],
+      "schemaVersion": 16,
+      "version": 0
+    },
+    "overwrite": true
+  }'
