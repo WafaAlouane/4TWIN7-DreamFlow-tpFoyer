@@ -1,0 +1,12 @@
+{
+  "dashboard": {
+    "id": null,
+    "uid": null,
+    "title": "Demo Dashboard",
+    "timezone": "browser",
+    "panels": [],
+    "schemaVersion": 16,
+    "version": 0
+  },
+  "overwrite": true
+}
