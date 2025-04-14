@@ -1,5 +1,5 @@
 package tn.esprit.tpfoyer.entity;
-
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -25,12 +25,10 @@ public class Etudiant {
     String nomEtudiant;
     String prenomEtudiant;
     long cinEtudiant;
+    @JsonFormat(pattern = "yyyy-MM-dd")
     Date dateNaissance;
 
     @ManyToMany(mappedBy = "etudiants")
     Set<Reservation> reservations;
 
 }
-
-
-
